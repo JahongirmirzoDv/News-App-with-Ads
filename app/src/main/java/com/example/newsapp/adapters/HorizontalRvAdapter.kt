@@ -10,11 +10,12 @@ import com.squareup.picasso.Picasso
 class HorizontalRvAdapter(var list: List<Article>) :
     RecyclerView.Adapter<HorizontalRvAdapter.Vh>() {
     inner class Vh(var itemview: HrItemBinding) : RecyclerView.ViewHolder(itemview.root) {
-        fun bind(article: Article) {
+        fun bind(article: Article, position: Int) {
             Picasso.get().load(article.urlToImage).into(itemview.image)
             itemview.avtor.text = article.title
             itemview.content.text = article.description
             itemview.content2.text = article.content
+
         }
     }
 
@@ -23,7 +24,7 @@ class HorizontalRvAdapter(var list: List<Article>) :
     }
 
     override fun onBindViewHolder(holder: Vh, position: Int) {
-        holder.bind(list[position])
+        holder.bind(list[position],position)
     }
 
     override fun getItemCount(): Int = list.size

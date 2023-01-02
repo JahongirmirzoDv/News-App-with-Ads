@@ -12,4 +12,10 @@ interface ApiService {
         @Query("q") q: String,
         @Query("page") page: Int
     ): NewsData
+
+    @GET("top-headlines")
+    suspend fun getTop(
+        @Query("apiKey") apiKey: String = "7676840141384f57bf770f9eaea7e821",
+        @Query("sources") sources: String = "bbc-news"
+    ): NewsData
 }

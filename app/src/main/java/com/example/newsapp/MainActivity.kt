@@ -3,36 +3,44 @@ package com.example.newsapp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
+import com.example.inputvalidator.ToasMaker
 import com.example.newsapp.databinding.ActivityMainBinding
+import com.example.newsapp.retrofit.ApiClient2
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private var mInterstitialAd: InterstitialAd? = null
     private val TAG = "MainActivity"
+    val adRequest = AdRequest.Builder().build()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        MobileAds.initialize(this) {}
+        MobileAds.initialize(this) {}
 
-//        binding.adView.loadAd(adRequest)
-//
-//        binding.ss.setOnClickListener {
-//            if (mInterstitialAd != null) {
-//                mInterstitialAd?.show(this)
-//            } else {
-//                Log.d("TAG", "The interstitial ad wasn't ready yet.")
-//            }
-//        }
+        binding.adView.loadAd(adRequest)
+        ads()
+        ToasMaker.show(this,"salom")
+
+        if (mInterstitialAd != null) {
+            mInterstitialAd?.show(this)
+        } else {
+            Log.d("TAG", "The interstitial ad wasn't ready yet.")
+        }
+
     }
 
     fun ads() {
-        val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(
             this,
             "ca-app-pub-9927026512417150/1993940079",

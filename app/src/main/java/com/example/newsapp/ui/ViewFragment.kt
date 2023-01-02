@@ -2,20 +2,17 @@ package com.example.newsapp.ui
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.newsapp.R
 import com.example.newsapp.adapters.InnerRvAdapter
-import com.example.newsapp.adapters.ViewPagerAdapter
 import com.example.newsapp.databinding.FragmentViewBinding
 import com.example.newsapp.models.Article
 import com.example.newsapp.retrofit.ApiClient
+import com.example.newsapp.retrofit.ApiClient2
 import com.example.newsapp.retrofit.ApiHelper
 import com.example.newsapp.retrofit.ApiHelperImpl
 import com.example.newsapp.utils.PaginationScrollListener
@@ -32,6 +29,7 @@ private const val ARG_PARAM1 = "param1"
  * Use the [ViewFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
+@Suppress("OPT_IN_IS_NOT_ENABLED")
 class ViewFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
@@ -64,9 +62,8 @@ class ViewFragment : Fragment() {
         setupViewmodel()
         linearLayoutManager = LinearLayoutManager(requireContext())
         paginationAdapter = InnerRvAdapter(requireContext())
-        apiHelperImpl = ApiHelperImpl(ApiClient.apiService)
+        apiHelperImpl = ApiHelperImpl(ApiClient.apiService,ApiClient2.apiService)
         param1?.let {
-
             binding.innerRv.addOnScrollListener(object :
                 PaginationScrollListener(linearLayoutManager) {
                 override fun loadMoreItems() {
@@ -93,8 +90,6 @@ class ViewFragment : Fragment() {
             }
             param1?.let { loadFirstPage(it) }
         }
-
-
         return binding.root
     }
 
@@ -103,14 +98,14 @@ class ViewFragment : Fragment() {
         viewModel = ViewModelProvider(
             this,
             ViewModelFactory(
-                ApiHelperImpl(ApiClient.apiService)
+                ApiHelperImpl(ApiClient.apiService,ApiClient2.apiService)
             )
         )[ApiControlViewmodel::class.java]
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     fun loadFirstPage(type: String) {
-        Log.e(TAG, "loadFirstPage: function_1")
+        Log.e(TAG, "loadFirstPage: $type")
         GlobalScope.launch(Dispatchers.Main) {
             withContext(Dispatchers.Main) {
                 try {
@@ -132,7 +127,7 @@ class ViewFragment : Fragment() {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun loadNextPage(page: Int, type: String) {
-        Log.e(TAG, "loadFirstPage: function_2")
+        Log.e(TAG, "loadFirstPage: $type")
         GlobalScope.launch(Dispatchers.Main) {
             withContext(Dispatchers.Main) {
                 try {

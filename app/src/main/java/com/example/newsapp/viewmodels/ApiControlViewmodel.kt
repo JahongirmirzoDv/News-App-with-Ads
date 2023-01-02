@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newsapp.models.NewsData
 import com.example.newsapp.retrofit.ApiHelper
+import com.example.newsapp.retrofit.model2.NAmes
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
@@ -26,5 +28,13 @@ class ApiControlViewmodel(private var apiHelper: ApiHelper) : ViewModel() {
             }
         }
         return newsList
+    }
+
+    fun getname(): MutableLiveData<NAmes> {
+        var n= MutableLiveData<NAmes>()
+        viewModelScope.launch {
+            n.value = apiHelper.getNames()
+        }
+        return n
     }
 }

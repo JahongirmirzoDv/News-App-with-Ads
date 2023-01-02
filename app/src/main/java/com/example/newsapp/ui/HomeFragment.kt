@@ -4,23 +4,30 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.WindowCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.example.newsapp.R
 import com.example.newsapp.adapters.HorizontalRvAdapter
+import com.example.newsapp.adapters.SnapHelperOneByOne
 import com.example.newsapp.adapters.ViewPagerAdapter
 import com.example.newsapp.databinding.FragmentHomeBinding
 import com.example.newsapp.retrofit.ApiClient
+import com.example.newsapp.retrofit.ApiClient2
 import com.example.newsapp.retrofit.ApiHelperImpl
 import com.example.newsapp.utils.ViewModelFactory
 import com.example.newsapp.viewmodels.ApiControlViewmodel
 import com.google.android.material.tabs.TabLayout
+
 
 class HomeFragment : Fragment() {
 
@@ -45,16 +52,27 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
         setupViewmodel()
+        viewModel.getname().observe(viewLifecycleOwner){
+            Log.e(TAG, "onCreateView: ${it.results.size}")
+        }
 
         viewModel.getNews(1, "").observe(viewLifecycleOwner) {
             Log.d(TAG, "onCreateView: ${it.articles.size}")
             binding.topRvProgress.visibility = View.GONE
+            var n= PagerSnapHelper()
             horizontalRvAdapter = HorizontalRvAdapter(it.articles)
             binding.rv.adapter = horizontalRvAdapter
+            n.attachToRecyclerView(binding.rv)
+            var mLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
+            val findSnapView = n.findSnapView(mLayoutManager)
+
+            findSnapView?.alpha = 0.2f
         }
         val viewPagerAdapter = ViewPagerAdapter(childFragmentManager, titleList)
         binding.viewpager2.adapter = viewPagerAdapter
         binding.tablayout.setupWithViewPager(binding.viewpager2)
+
         setTabs()
         binding.tablayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             @SuppressLint("ResourceAsColor")
@@ -76,6 +94,9 @@ class HomeFragment : Fragment() {
             }
         })
 
+        binding.notification.setOnClickListener {
+            findNavController().navigate(R.id.blankFragment)
+        }
 
 
 
@@ -83,14 +104,14 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    private fun setupViewmodel() {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelFactory(
-                ApiHelperImpl(ApiClient.apiService)
-            )
-        )[ApiControlViewmodel::class.java]
-    }
+        private fun setupViewmodel() {
+            viewModel = ViewModelProvider(
+                this,
+                ViewModelFactory(
+                    ApiHelperImpl(ApiClient.apiService,ApiClient2.apiService)
+                )
+            )[ApiControlViewmodel::class.java]
+        }
 
     @SuppressLint("ResourceAsColor")
     private fun setTabs() {
